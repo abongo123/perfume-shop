@@ -27,7 +27,7 @@ export default function SidebarFilters({
       {/* Sidebar */}
       <aside
         className={`
-          fixed md:static top-16 md:top-0 left-0 z-50
+          fixed md:static top-16 md:top-0 left-0 z-40
           w-64 p-5 max-h-[calc(100vh-4rem)]
           overflow-y-auto bg-[#828c51] text-white
           transform transition-transform duration-300 ease-in-out
@@ -50,7 +50,7 @@ export default function SidebarFilters({
           <ul className="space-y-2 text-sm">
             <li
               onClick={() => setFilters({ ...filters, type: "All" })}
-              className={`cursor-pointer transition hover:text-yellow-200 ${
+              className={`cursor-pointer transition hover:text-black ${
                 filters.type === "All" ? "underline font-semibold" : ""
               }`}
             >
@@ -61,7 +61,7 @@ export default function SidebarFilters({
               <li
                 key={cat}
                 onClick={() => setFilters({ ...filters, type: cat })}
-                className={`cursor-pointer transition hover:text-yellow-200 ${
+                className={`cursor-pointer transition hover:text-black ${
                   filters.type === cat ? "underline font-semibold" : ""
                 }`}
               >
@@ -73,7 +73,7 @@ export default function SidebarFilters({
 
         {/* Filters */}
         <div>
-          <h3 className="font-semibold mb-5 text-yellow-100">Filter By:</h3>
+          <h3 className="font-semibold mb-5 text-gray-800">Filter By:</h3>
 
           {/* Price */}
           <div className="mb-6">
@@ -89,7 +89,7 @@ export default function SidebarFilters({
               onChange={(e) =>
                 setFilters({ ...filters, price: Number(e.target.value) })
               }
-              className="w-full cursor-pointer accent-yellow-400"
+              className="w-full cursor-pointer accent-gray-900"
             />
           </div>
 
