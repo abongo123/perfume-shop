@@ -3,14 +3,19 @@ import { useCart } from "../context/CartContext";
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
 
+  // ✅ Detect dev vs prod for images
+  const BASE_URL = import.meta.env.DEV
+    ? "http://localhost:5000" // Local backend
+    : "https://my-backend.vercel.app"; // Deployed backend
+
   return (
     <div className="group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-
+      
       {/* IMAGE WRAPPER */}
       <div className="relative w-full h-56 overflow-hidden">
         {/* PRODUCT IMAGE */}
         <img
-          src={`http://localhost:5000${product.image}`} // backend URL
+          src={`${BASE_URL}${product.image}`} // Use BASE_URL dynamically
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
@@ -51,3 +56,4 @@ export default function ProductCard({ product }) {
     </div>
   );
 }
+

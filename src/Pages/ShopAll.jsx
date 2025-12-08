@@ -4,7 +4,6 @@ import ProductCard from "../components/ProductCard";
 import SidebarFilters from "../components/SidebarFilters";
 
 export default function ShopAll() {
-  // ✅ FIXED: Added "Luxury"
   const categories = ["Floral", "Woody", "Fresh", "Citrus", "Luxury"];
 
   const [products, setProducts] = useState([]);
@@ -20,22 +19,21 @@ export default function ShopAll() {
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // ✅ ✅ FINAL FIXED FETCH (NO MORE ERR_CONNECTION_REFUSED)
+  // ✅ Environment-aware API URL
+  const API_URL = import.meta.env.DEV
+    ? "http://localhost:5000/api/products" // Local backend
+    : "https://my-backend.vercel.app/api/products"; // Deployed backend
+
   useEffect(() => {
-    fetch("/api/products")
+    fetch(API_URL)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch");
         return res.json();
       })
       .then((data) => {
-        console.log("✅ Products Loaded:", data);
-
         setProducts(data);
 
-        const highest = data.length
-          ? Math.max(...data.map((p) => p.price))
-          : 0;
-
+        const highest = data.length ? Math.max(...data.map((p) => p.price)) : 0;
         setMaxPrice(highest);
         setFilters((prev) => ({ ...prev, price: highest }));
         setLoading(false);
@@ -44,48 +42,31 @@ export default function ShopAll() {
         console.error("❌ Failed to fetch products:", err);
         setLoading(false);
       });
-  }, []);
+  }, [API_URL]);
 
-  // ✅ FILTER LOGIC
-  let filteredProducts = products.filter((product) => {
-    const matchType =
-      filters.type === "All" || product.type === filters.type;
-
+  // Filter products
+  const filteredProducts = products.filter((product) => {
+    const matchType = filters.type === "All" || product.type === filters.type;
     const matchPrice = product.price <= filters.price;
-
     const matchQty = product.quantity >= filters.quantity;
-
-    const matchSize =
-      filters.size === "All" || product.size === Number(filters.size);
-
+    const matchSize = filters.size === "All" || product.size === Number(filters.size);
     return matchType && matchPrice && matchQty && matchSize;
   });
 
-  // ✅ SORTING
-  if (sort === "low-high")
-    filteredProducts.sort((a, b) => a.price - b.price);
+  // Sort products
+  if (sort === "low-high") filteredProducts.sort((a, b) => a.price - b.price);
+  if (sort === "high-low") filteredProducts.sort((a, b) => b.price - a.price);
 
-  if (sort === "high-low")
-    filteredProducts.sort((a, b) => b.price - a.price);
-
-  // ✅ CLEAR FILTERS
   function clearFilters() {
-    setFilters({
-      type: "All",
-      price: maxPrice,
-      quantity: 0,
-      size: "All",
-    });
+    setFilters({ type: "All", price: maxPrice, quantity: 0, size: "All" });
   }
 
   return (
     <div
       className="flex min-h-screen pt-24"
-      style={{
-        background: "linear-gradient(to bottom,#f7c8b3,#FFFFFF,#F2F2F2)",
-      }}
+      style={{ background: "linear-gradient(to bottom,#f7c8b3,#FFFFFF,#F2F2F2)" }}
     >
-      {/* ✅ MOBILE FILTER BUTTON */}
+      {/* MOBILE FILTER BUTTON */}
       <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
         <button
           onClick={() => setShowFilters(true)}
@@ -95,7 +76,7 @@ export default function ShopAll() {
         </button>
       </div>
 
-      {/* ✅ SIDEBAR */}
+      {/* SIDEBAR */}
       <SidebarFilters
         categories={categories}
         filters={filters}
@@ -105,15 +86,13 @@ export default function ShopAll() {
         close={() => setShowFilters(false)}
       />
 
-      {/* ✅ MAIN CONTENT */}
+      {/* MAIN CONTENT */}
       <div className="flex-1 p-6">
-        {/* ✅ TOP BAR */}
+        {/* TOP BAR */}
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="text-sm text-gray-600">
-            <Link to="/" className="underline mr-2">
-              Home
-            </Link>{" "}
-            / <span className="ml-2">All Products</span>
+            <Link to="/" className="underline mr-2">Home</Link> / 
+            <span className="ml-2">All Products</span>
           </div>
 
           <div className="flex items-center gap-4">
@@ -136,32 +115,23 @@ export default function ShopAll() {
           </div>
         </div>
 
-        {/* ✅ PRODUCT COUNT */}
+        {/* PRODUCT COUNT */}
         <p className="text-sm mb-4 text-gray-600">
           Showing {filteredProducts.length} products
         </p>
 
-        {/* ✅ LOADING STATE */}
+        {/* LOADING / GRID */}
         {loading ? (
-          <div className="text-center py-20 text-gray-500">
-            Loading products...
-          </div>
+          <div className="text-center py-20 text-gray-500">Loading products...</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 bg-white border border-[#F2F2F2] shadow-md rounded-lg">
             {filteredProducts.length === 0 ? (
               <div className="col-span-full text-center text-gray-500 space-y-3">
                 <p>No products match your filters.</p>
-                <button
-                  onClick={clearFilters}
-                  className="underline text-sm"
-                >
-                  Reset Filters
-                </button>
+                <button onClick={clearFilters} className="underline text-sm">Reset Filters</button>
               </div>
             ) : (
-              filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))
+              filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)
             )}
           </div>
         )}
