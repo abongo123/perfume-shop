@@ -22,7 +22,7 @@ export default function ShopAll() {
   // ✅ Environment-aware API URL
   const API_URL = import.meta.env.DEV
     ? "http://localhost:5000/api/products" // Local backend
-    : "https://my-backend.vercel.app/api/products"; // Deployed backend
+    : "https://perfume-shop-duie.vercel.app/api/products"; // Deployed backend
 
   useEffect(() => {
     fetch(API_URL)
